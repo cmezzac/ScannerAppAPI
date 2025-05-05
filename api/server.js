@@ -7,12 +7,15 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
+//Increase body size limit
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ extended: true, limit: "25mb" }));
+
 //Define Routers
-const openAiRouter = require("./routes/OpenAi");
+const openAiRouter = require("./routes/ShippingRouter");
 
 //Register the endpoints
-app.use(express.json());
-app.use("/api/openAi", openAiRouter);
+app.use("/api/shipping", openAiRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to the home page!");

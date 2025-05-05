@@ -18,11 +18,12 @@ async function readImageLabel(ocrText) {
             text: `
 You are a strict JSON generator.
 
-Given the OCR text from a shipping label below, extract the recipient's name and full shipping address (not the sender), and return it ONLY as JSON like this:
+Given the OCR text from a shipping label below, extract the recipient's name and apprtment number of the receiver. The appartment number is 
+typically found after the street adress so look for it there , and return it ONLY as JSON like this:
 
 {
   "name": "John Doe",
-  "address": "123 Main Street, Apt 4B, New York, 10001, USA"
+  "appartment": "402"
 }
 
 Do not add any explanation or extra text. Only return valid JSON.

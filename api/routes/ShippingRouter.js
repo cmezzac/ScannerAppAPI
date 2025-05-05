@@ -3,9 +3,10 @@ const router = express.Router();
 const { readImageLabel } = require("../services/LabelReaderService");
 const { getShippingLabelAsString } = require("../services/OcrReaderService");
 
-router.get("/readShippingLabel", async (req, res) => {
+router.post("/readShippingLabel", async (req, res) => {
   try {
-    const ocrText = await getShippingLabelAsString();
+    const image = req.body.image;
+    const ocrText = await getShippingLabelAsString(image);
 
     const result = await readImageLabel(ocrText);
     res.status(200).json(result);
