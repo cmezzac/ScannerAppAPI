@@ -1,11 +1,14 @@
 const dotenv = require("dotenv");
 const express = require("express");
+const connectDB = require("./database/databaseConnection");
 
 dotenv.config();
 
 const app = express();
 
 const PORT = process.env.PORT || 3000;
+
+connectDB();
 
 //Increase body size limit
 app.use(express.json({ limit: "25mb" }));
@@ -17,14 +20,6 @@ const openAiRouter = require("./routes/ShippingRouter");
 //Register the endpoints
 app.use("/api/shipping", openAiRouter);
 
-app.get("/", (req, res) => {
-  res.send("Welcome to the home page!");
-});
-
-app.get("/about", (req, res) => {
-  res.send("This is the about page.");
-});
-
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}/`);
+  console.log(`🚀 Server running at http://localhost:${PORT}/`);
 });
