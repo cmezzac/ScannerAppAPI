@@ -17,10 +17,12 @@ app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 //Define Routers
 const openAiRouter = require("./routes/ShippingRouter");
 const buildingRouter = require("./routes/BuildingRouter");
+const roleRouter = require("./routes/RoleRouter");
 
 //Register the endpoints
 app.use("/api/shipping", openAiRouter);
 app.use("/api/building", buildingRouter);
+app.use("/api/role", roleRouter);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}/`);
