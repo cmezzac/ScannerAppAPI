@@ -1,0 +1,61 @@
+const express = require("express");
+const router = express.Router();
+const Apartment = require("../database/models/Apartment");
+const User = require("../database/models/User");
+
+router.post("/createNewApartment", async (req, res) => {
+  const { number, firstName, lastName, buildingId } = req.body;
+
+  if (
+    !Array.isArray(firstName) ||
+    !Array.isArray(lastName) ||
+    firstName.length !== lastName.length
+  ) {
+    return res
+      .status(400)
+      .json({ error: "firstName and lastName must be arrays of equal length" });
+  }
+
+  try {
+    const userIds = [];
+
+    // Loop over each name pair
+    for (let i = 0; i < firstName.length; i++) {
+      const user = await User.findOne({
+        firstName: firstName[i],
+        lastName: lastName[i],
+        buildingId,
+      });
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ error: `User not found: ${firstName[i]} ${lastName[i]}` });
+      }
+
+      userIds.push(user._id);
+    }
+
+    if (userIds.length > 3) {
+      return res
+        .status(400)
+        .json({ error: "An apartment can have a maximum of 3 users." });
+    }
+
+    const newApartment = new Apartment({
+      number,
+      userIds,
+      buildingId,
+    });
+
+    await newApartment.save();
+
+    res.status(200).json({
+      message: `Apartment ${number} created with ${userIds.length} user(s).`,
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+module.exports = router;
