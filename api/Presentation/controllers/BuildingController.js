@@ -1,15 +1,13 @@
-const express = require("express");
-const router = express.Router();
-const Building = require("../database/models/Building");
+const Building = require("../../DataAccess/models/Building");
 
-router.post("/insertNewBuilding", async (req, res) => {
-  const { Name, Adress, buildingId } = req.body;
+const insertNewBuilding = async (req, res) => {
+  const { Name, Adress, numberOfApartment } = req.body;
 
   try {
     const newBuilding = new Building({
       Name,
       Adress,
-      buildingId,
+      numberOfApartment,
     });
 
     await newBuilding.save();
@@ -20,5 +18,8 @@ router.post("/insertNewBuilding", async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
-});
-module.exports = router;
+};
+
+module.exports = {
+  insertNewBuilding,
+};

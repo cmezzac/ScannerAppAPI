@@ -1,10 +1,8 @@
-const express = require("express");
-const router = express.Router();
-const User = require("../database/models/User");
-const Role = require("../database/models/Role");
-const Building = require("../database/models/Building");
+const User = require("../../DataAccess/models/User");
+const Role = require("../../DataAccess/models/Role");
+const Building = require("../../DataAccess/models/Building");
 
-router.post("/createUser", async (req, res) => {
+const createUser = async (req, res) => {
   try {
     const {
       firstName,
@@ -21,7 +19,7 @@ router.post("/createUser", async (req, res) => {
       return res.status(400).json({ error: "Invalid role" });
     }
 
-    const buildingDocument = await Building.findOne({ _id: buildingId });
+    const buildingDocument = await Building.findById(buildingId);
     if (!buildingDocument) {
       return res.status(400).json({ error: "Invalid building Id" });
     }
@@ -47,20 +45,22 @@ router.post("/createUser", async (req, res) => {
         });
       }
       userData.userName = userName;
-      userData.password = password; //This needs to be hashed in the future
+      userData.password = password; // 🔒 Should hash this in the future
     }
 
     const newUser = new User(userData);
-
     await newUser.save();
+
     res.status(201).json({
       message: "User created successfully",
       userId: newUser._id,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Failed to create user:", error);
     res.status(500).json({ error: "Failed to add user" });
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  createUser,
+};

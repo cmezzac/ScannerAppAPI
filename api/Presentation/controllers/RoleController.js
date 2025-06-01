@@ -1,9 +1,13 @@
-const express = require("express");
-const router = express.Router();
-const Role = require("../database/models/Role");
+const Role = require("../../DataAccess/models/Role");
 
-router.post("/createNewRole", async (req, res) => {
+const createNewRole = async (req, res) => {
   const { name, privileges } = req.body;
+
+  if (!name || !Array.isArray(privileges)) {
+    return res.status(400).json({
+      error: "Role name and privileges (as an array) are required.",
+    });
+  }
 
   try {
     const newRole = new Role({
@@ -21,6 +25,8 @@ router.post("/createNewRole", async (req, res) => {
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  createNewRole,
+};

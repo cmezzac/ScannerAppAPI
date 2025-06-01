@@ -1,9 +1,7 @@
-const express = require("express");
-const router = express.Router();
-const Apartment = require("../database/models/Apartment");
-const User = require("../database/models/User");
+const Apartment = require("../../DataAccess/models/Apartment");
+const User = require("../../DataAccess/models/User");
 
-router.post("/createNewApartment", async (req, res) => {
+const createNewApartment = async (req, res) => {
   const { number, firstName, lastName, buildingId } = req.body;
 
   if (
@@ -11,15 +9,14 @@ router.post("/createNewApartment", async (req, res) => {
     !Array.isArray(lastName) ||
     firstName.length !== lastName.length
   ) {
-    return res
-      .status(400)
-      .json({ error: "firstName and lastName must be arrays of equal length" });
+    return res.status(400).json({
+      error: "firstName and lastName must be arrays of equal length",
+    });
   }
 
   try {
     const userIds = [];
 
-    // Loop over each name pair
     for (let i = 0; i < firstName.length; i++) {
       const user = await User.findOne({
         firstName: firstName[i],
@@ -28,9 +25,9 @@ router.post("/createNewApartment", async (req, res) => {
       });
 
       if (!user) {
-        return res
-          .status(404)
-          .json({ error: `User not found: ${firstName[i]} ${lastName[i]}` });
+        return res.status(404).json({
+          error: `User not found: ${firstName[i]} ${lastName[i]}`,
+        });
       }
 
       userIds.push(user._id);
@@ -54,8 +51,10 @@ router.post("/createNewApartment", async (req, res) => {
       message: `Apartment ${number} created with ${userIds.length} user(s).`,
     });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  createNewApartment,
+};
