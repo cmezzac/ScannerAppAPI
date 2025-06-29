@@ -55,6 +55,29 @@ const createNewApartment = async (req, res) => {
   }
 };
 
+const addTenant = async (req, res) => {
+  const {firstName,lastName} = req.body;
+
+  const userIds = [];
+
+  for (let i = 0; i < firstName.length; i++) {
+    const user = await User.findOne({
+      firstName: firstName[i],
+      lastName: lastName[i],
+      buildingId,
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        error: `User not found: ${firstName[i]} ${lastName[i]}`,
+      });
+    }
+
+    userIds.push(user._id);
+  }
+
+};
+
 module.exports = {
   createNewApartment,
 };

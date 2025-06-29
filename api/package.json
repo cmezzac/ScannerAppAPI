@@ -13,6 +13,7 @@
   "dependencies": {
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "faker": "^5.5.3",
     "mongoose": "^8.14.3",
     "openai": "^4.97.0",
     "tesseract.js": "^6.0.1",

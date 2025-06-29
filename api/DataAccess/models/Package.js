@@ -1,21 +1,55 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const packageSchema = new Schema({
-  trackingNumber: { type: String, required: true, unique: true }, // your own package identifier
-  userId: { type: Schema.Types.ObjectId, ref: "User", required: true }, // who the package belongs to
-  processedDate: { type: Date, required: true },
-  confirmationDate: { type: Date }, // can be null until confirmed
-  status: {
-    type: String,
-    enum: ["Pending", "Confirmed"],
-    required: true,
+const packageSchema = new Schema(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    processedDate: {
+      type: Date,
+      required: true,
+      default: Date.now,
+    },
+
+    confirmationDate: {
+      type: Date,
+    },
+    trackingNumber: {
+      type: String,
+    },
+    courrier: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    status: {
+      type: String,
+      enum: ["Pending", "Confirmed"],
+      required: true,
+      default: "Pending",
+    },
+
+    buildingId: {
+      type: Schema.Types.ObjectId,
+      ref: "Building",
+      required: true,
+    },
+
+    urgent: {
+      type: Boolean,
+      default: false,
+    },
+
+    photo: {
+      type: String, // base64 or a URL if using blob storage
+    },
   },
-  buildingId: {
-    type: Schema.Types.ObjectId,
-    ref: "Building",
-    required: true,
-  },
-});
+  { timestamps: true } // Adds createdAt and updatedAt fields
+);
 
 module.exports = mongoose.model("Package", packageSchema);
