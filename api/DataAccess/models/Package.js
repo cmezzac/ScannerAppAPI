@@ -14,7 +14,6 @@ const packageSchema = new Schema(
       required: true,
       default: Date.now,
     },
-
     confirmationDate: {
       type: Date,
     },

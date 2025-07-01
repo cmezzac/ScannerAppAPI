@@ -83,4 +83,49 @@ const getPendingPackages = async (req, res) => {
   }
 };
 
-module.exports = { addPackage, getPendingPackages };
+const getConfirmedPackages = async (req, res) => {
+  console.log("Trying to get Confirmed Packages");
+
+  try {
+    const confirmedPackages = await Package.find({ status: "Confirmed" })
+      .populate({
+        path: "userId",
+        populate: {
+          path: "apartmentId",
+        },
+      })
+      .populate("buildingId");
+
+    const grouped = {};
+
+    for (const pkg of confirmedPackages) {
+      console.log(pkg);
+      const apartmentNumber = pkg.userId?.apartmentId?.number || "Unknown";
+
+      if (!grouped[apartmentNumber]) {
+        grouped[apartmentNumber] = {
+          apartmentNumber,
+          packages: [],
+        };
+      }
+
+      grouped[apartmentNumber].packages.push({
+        trackingNumber: pkg.trackingNumber,
+        name: `${pkg.userId.firstName} ${pkg.userId.lastName}`,
+        scannedDate: pkg.processedDate,
+        confirmedDate: pkg.confirmationDate,
+        urgent: pkg.urgent,
+        courrier: pkg.courrier,
+        photo: pkg.photo,
+      });
+    }
+    const result = Object.values(grouped);
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Failed to retrieve and group pending packages:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+module.exports = { addPackage, getPendingPackages, getConfirmedPackages };

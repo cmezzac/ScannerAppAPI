@@ -109,15 +109,22 @@ async function populateDatabase() {
     users.push(user);
   }
 
+  const courriers = ["Canada Post", "Purolator", "FedEx", "UPS", "Amazon"];
+
   for (const user of users) {
     const numPackages = Math.floor(Math.random() * 3) + 1;
     for (let i = 0; i < numPackages; i++) {
+      const status = Math.random() < 0.5 ? "Pending" : "Confirmed";
+      const courrier = courriers[Math.floor(Math.random() * courriers.length)];
+
       await Package.create({
         userId: user._id,
         processedDate: faker.date.recent(10),
-        courrier: "Canada Post",
+        confirmationDate:
+          status === "Confirmed" ? faker.date.recent(10) : undefined,
+        courrier,
         trackingNumber: `TRACK${faker.datatype.uuid().slice(0, 8)}`,
-        status: Math.random() < 0.5 ? "Pending" : "Confirmed",
+        status,
         buildingId: building._id,
         urgent: Math.random() < 0.3,
         photo: shortBase64,
