@@ -20,7 +20,7 @@ const Apartment = require("./DataAccess/models/Apartment");
 const MAX_USERS_PER_APT = 3;
 const NUM_APARTMENTS = 10;
 const TOTAL_USERS = 20;
-const shortBase64 = "data:image/png;base64,iVBORw0KGgo=";
+const shortBase64 = "";
 
 //Define Routers
 const openAiRouter = require("./Presentation/routes/ShippingRouter");
