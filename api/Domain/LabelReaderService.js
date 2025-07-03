@@ -3,7 +3,9 @@ const envApiKey = process.env.OPEN_AI_API_KEY;
 
 const openai = new OpenAI({ apiKey: envApiKey });
 
-async function readImageLabel(ocrText) {
+const nlp = require("compromise");
+
+async function readImageLabell(ocrText) {
   console.log("INSIDE THE LABEL READER:");
   console.log(ocrText);
 
@@ -48,6 +50,29 @@ ${ocrText}
     console.warn("Could not parse JSON. Raw output:", raw);
     return raw;
   }
+}
+
+async function readImageLabel(ocrText) {
+  console.log("INSIDE THE LABEL READER:");
+  console.log(ocrText);
+
+  const lines = ocrText.split(/\r?\n/).map((line) => line.trim());
+
+  for (const line of lines) {
+    if (/^[A-Z\s]{5,}$/.test(line) && line.split(" ").length >= 2) {
+      return { name: toTitleCase(line) };
+    }
+  }
+
+  return { name: null };
+}
+
+function toTitleCase(str) {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 }
 
 module.exports = { readImageLabel };
