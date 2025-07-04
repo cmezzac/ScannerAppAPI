@@ -20,7 +20,9 @@ async function createPackageForUser(
 
     const [firstName, lastName] = nameParts;
 
-    const user = await User.findOne({ firstName, lastName });
+    const user = await User.findOne({ firstName, lastName }).populate(
+      "apartmentId"
+    );
     if (!user) {
       throw new Error(`User "${fullName}" not found.`);
     }
@@ -47,8 +49,18 @@ async function createPackageForUser(
       console.error("❌ Mongoose Save Error:", err);
       throw err;
     });
+
     console.log("📦 Package successfully saved for user:", fullName);
-    return { success: true, message: "Package created successfully." };
+
+    const apartmentNumber = user.apartmentId?.number || "Unknown";
+
+    return {
+      name: fullName,
+      trackingNumber: userTrackingNumber,
+      courier: shippingCourrier,
+      apartment: `Apartment ${apartmentNumber}`,
+      urgent: isUrgent,
+    };
   } catch (error) {
     console.error("❌ Failed to create package:", error.message);
     return { success: false, error: error.message };

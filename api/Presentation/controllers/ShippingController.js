@@ -20,7 +20,7 @@ const {
 const readShippingLabel = async (req, res) => {
   try {
     const { detailsImage, fullPackageImage, isUrgent } = req.body;
-    const moneySwitch = true;
+    const moneySwitch = false;
 
     if (!detailsImage || !fullPackageImage) {
       return res.status(400).json({ error: "Missing image in request body" });
@@ -31,6 +31,7 @@ const readShippingLabel = async (req, res) => {
     if (moneySwitch) {
       console.log("MONEYSWITCH = true");
       const aiText = await readShippingLabelWithOpenAI(detailsImage);
+      console.log(aiText);
       const cleaned = aiText.replace(/```json|```/g, "").trim();
 
       let parsed;
@@ -52,18 +53,17 @@ const readShippingLabel = async (req, res) => {
       //const ocrText = await getShippingLabelAsString(image);
       //result = await readImageLabel(ocrText);
     }
-
-    res.status(200).json(result);
-
-    console.log(result);
-
-    createPackageForUser(
+    const data = await createPackageForUser(
       result.Name,
       result.TrackingNumber,
       result.Courier,
       fullPackageImage,
       isUrgent
     );
+
+    console.log(data);
+
+    res.status(200).json(data);
   } catch (error) {
     console.error("❌ Failed to process label:", error);
     res.status(500).json({ error: "Failed to process label" });

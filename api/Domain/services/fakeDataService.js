@@ -11,7 +11,7 @@ const generateFakeShippingLabel = () => {
     "Ari Zergiotis",
     "Sofia St-Pierre",
     "Bianca D'alescio",
-    "Roula Atahansopoulos",
+    "Roula Athanasopoulos",
     "Joseph Mezzacappa",
   ];
 
