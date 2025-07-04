@@ -2,7 +2,7 @@ const express = require("express");
 const connectDB = require("./DataAccess/databaseConnection");
 const config = require("./config");
 const faker = require("faker");
-const { sendSMS } = require("./Presentation/services/textMessageService");
+const { sendSMS } = require("./Domain/services/textMessageService");
 
 const app = express();
 
