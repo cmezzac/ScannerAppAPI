@@ -1,3 +1,6 @@
+const fs = require("fs");
+const path = require("path");
+
 const { readImageLabel } = require("../../Domain/services/LabelReaderService");
 const {
   getShippingLabelAsString,
@@ -10,13 +13,16 @@ const {
 const {
   generateFakeShippingLabel,
 } = require("../../Domain/services/fakeDataService");
+const {
+  createPackageForUser,
+} = require("../../DataAccess/services/packageService");
 
 const readShippingLabel = async (req, res) => {
   try {
-    const image = req.body.image;
-    const moneySwitch = false;
+    const { detailsImage, fullPackageImage, isUrgent } = req.body;
+    const moneySwitch = true;
 
-    if (!image) {
+    if (!detailsImage || !fullPackageImage) {
       return res.status(400).json({ error: "Missing image in request body" });
     }
 
@@ -24,7 +30,7 @@ const readShippingLabel = async (req, res) => {
 
     if (moneySwitch) {
       console.log("MONEYSWITCH = true");
-      const aiText = await readShippingLabelWithOpenAI(image);
+      const aiText = await readShippingLabelWithOpenAI(detailsImage);
       const cleaned = aiText.replace(/```json|```/g, "").trim();
 
       let parsed;
@@ -41,13 +47,23 @@ const readShippingLabel = async (req, res) => {
       console.log("MONEYSWITCH = false");
 
       const shippingLabel = generateFakeShippingLabel();
-      result = JSON.stringify(shippingLabel, null, 2);
+      result = shippingLabel;
       //COMMENTED OCR FOR FAKE DATA FOR NOW
       //const ocrText = await getShippingLabelAsString(image);
       //result = await readImageLabel(ocrText);
     }
 
     res.status(200).json(result);
+
+    console.log(result);
+
+    createPackageForUser(
+      result.Name,
+      result.TrackingNumber,
+      result.Courier,
+      fullPackageImage,
+      isUrgent
+    );
   } catch (error) {
     console.error("❌ Failed to process label:", error);
     res.status(500).json({ error: "Failed to process label" });

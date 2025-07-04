@@ -17,7 +17,8 @@ async function readShippingLabelWithOpenAI(base64Image) {
                 Extract the following:
                 - Name (the recipient's full name)
                 - TrackingNumber (the tracking number from the label)
-                - Courier (e.g., UPS, FedEx, DHL, Canada Post, Purolator, etc.)
+                - Courier (e.g., UPS, FedEx, DHL, Canada Post, Purolator, Amazon: If you see a label
+                and you can infer it, please do!)
 
                 Return the result as a **valid JSON object** using this exact format:
                 {
