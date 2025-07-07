@@ -17,6 +17,8 @@ const {
   createPackageForUser,
 } = require("../../DataAccess/services/packageService");
 
+const { sendSMS } = require("../../Domain/services/textMessageService");
+
 const readShippingLabel = async (req, res) => {
   try {
     const { detailsImage, fullPackageImage, isUrgent } = req.body;
@@ -59,6 +61,13 @@ const readShippingLabel = async (req, res) => {
       result.Courier,
       fullPackageImage,
       isUrgent
+    );
+
+    const link = `https://yourapp.com/package/${data._id}`;
+
+    sendSMS(
+      "+15146533143",
+      `📦 You have a new package!\nTrack it here: ${link}`
     );
 
     console.log(data);
