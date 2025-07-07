@@ -45,11 +45,10 @@ async function createPackageForUser(
       photo: newPackage.photo ? "[image included]" : "No image",
     });
 
-    await newPackage.save().catch((err) => {
+    const savedPackage = await newPackage.save().catch((err) => {
       console.error("❌ Mongoose Save Error:", err);
       throw err;
     });
-
     console.log("📦 Package successfully saved for user:", fullName);
 
     const apartmentNumber = user.apartmentId?.number || "Unknown";
@@ -60,6 +59,7 @@ async function createPackageForUser(
       courier: shippingCourrier,
       apartment: `Apartment ${apartmentNumber}`,
       urgent: isUrgent,
+      _id: savedPackage._id,
     };
   } catch (error) {
     console.error("❌ Failed to create package:", error.message);

@@ -1,5 +1,7 @@
 const Package = require("../../DataAccess/models/Package");
 const User = require("../../DataAccess/models/User");
+const Apartment = require("../../DataAccess/models/Apartment");
+const Building = require("../../DataAccess/models/Building");
 
 const addPackage = async (req, res) => {
   const { trackingNumber, name } = req.body;
@@ -128,4 +130,80 @@ const getConfirmedPackages = async (req, res) => {
   }
 };
 
-module.exports = { addPackage, getPendingPackages, getConfirmedPackages };
+const getPackageDetails = async (req, res) => {
+  const { packageId } = req.params;
+
+  if (!packageId) {
+    return res.status(400).json({ error: "Missing package ID" });
+  }
+
+  try {
+    const pkg = await Package.findById(packageId)
+      .populate({
+        path: "userId",
+        populate: [
+          { path: "apartmentId", model: "Apartment" },
+          { path: "buildingId", model: "Building" },
+          { path: "role" },
+        ],
+      })
+      .populate("buildingId");
+
+    if (!pkg || !pkg.userId) {
+      return res.status(404).json({ error: "Package not found" });
+    }
+
+    const apartmentNumber = pkg.userId.apartmentId?.number || "Unknown";
+    const buildingName =
+      pkg.buildingId?.name || pkg.userId.buildingId?.name || "Unknown";
+    const userFullName = `${pkg.userId.firstName} ${pkg.userId.lastName}`;
+
+    res.status(200).json({
+      building: buildingName,
+      apartment: apartmentNumber,
+      name: userFullName,
+      trackingNumber: pkg.trackingNumber,
+      imageUrl: pkg.photo || "/webappimage.jpg",
+      status: pkg.status, // ✅ added status here
+    });
+  } catch (err) {
+    console.error("❌ Failed to get package details:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+const confirmPackage = async (req, res) => {
+  console.log("Confirming");
+  const { packageId, confirmationDate } = req.body; // ✅ from body
+
+  if (!packageId) {
+    return res.status(400).json({ error: "Missing package ID" });
+  }
+
+  try {
+    const pkg = await Package.findById(packageId);
+
+    if (!pkg) {
+      return res.status(404).json({ error: "Package not found" });
+    }
+
+    pkg.status = "Confirmed";
+    pkg.confirmationDate = confirmationDate
+      ? new Date(confirmationDate)
+      : new Date(); // use provided or current
+    await pkg.save();
+
+    res.status(200).json({ message: "Package confirmed", packageId });
+  } catch (error) {
+    console.error("❌ Error confirming package:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+module.exports = {
+  addPackage,
+  getPendingPackages,
+  getConfirmedPackages,
+  getPackageDetails,
+  confirmPackage,
+};

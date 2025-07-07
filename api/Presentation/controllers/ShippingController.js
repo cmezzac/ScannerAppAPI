@@ -63,8 +63,11 @@ const readShippingLabel = async (req, res) => {
       isUrgent
     );
 
-    const link = `https://yourapp.com/package/${data._id}`;
+    const webAppUrl = process.env.WEB_APP_URL;
 
+    const link = `${webAppUrl}/${data._id}`;
+
+    console.log("LINK: ", link);
     sendSMS(
       "+15146533143",
       `📦 You have a new package!\nTrack it here: ${link}`

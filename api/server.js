@@ -3,10 +3,13 @@ const connectDB = require("./DataAccess/databaseConnection");
 const config = require("./config");
 const faker = require("faker");
 const { sendSMS } = require("./Domain/services/textMessageService");
+const cors = require("cors");
 
 const app = express();
 
 connectDB(config.mongoUri);
+
+app.use(cors());
 
 //Increase body size limit
 app.use(express.json({ limit: "25mb" }));
