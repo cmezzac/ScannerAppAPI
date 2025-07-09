@@ -61,6 +61,8 @@ const createUser = async (req, res) => {
   }
 };
 
+const getPackageInfoById = async (req, res) => {};
+
 module.exports = {
   createUser,
 };

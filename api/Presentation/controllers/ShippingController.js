@@ -22,7 +22,7 @@ const { sendSMS } = require("../../Domain/services/textMessageService");
 const readShippingLabel = async (req, res) => {
   try {
     const { detailsImage, fullPackageImage, isUrgent } = req.body;
-    const moneySwitch = false;
+    const moneySwitch = true;
 
     if (!detailsImage || !fullPackageImage) {
       return res.status(400).json({ error: "Missing image in request body" });
