@@ -22,9 +22,9 @@ const addPackage = async (req, res) => {
     const newPackage = new Package({
       trackingNumber,
       userId: user._id,
-      apartmentId: user.apartmentId, // assuming your User model has this
+      apartmentId: user.apartmentId,
       buildingId: user.buildingId,
-      status: "Pending", // or Delivered, depending on your logic
+      status: "Pending",
       receivedAt: new Date(),
     });
 
@@ -164,7 +164,7 @@ const getPackageDetails = async (req, res) => {
       name: userFullName,
       trackingNumber: pkg.trackingNumber,
       imageUrl: pkg.photo || "/webappimage.jpg",
-      status: pkg.status, // ✅ added status here
+      status: pkg.status,
     });
   } catch (err) {
     console.error("❌ Failed to get package details:", err);
@@ -174,7 +174,7 @@ const getPackageDetails = async (req, res) => {
 
 const confirmPackage = async (req, res) => {
   console.log("Confirming");
-  const { packageId, confirmationDate } = req.body; // ✅ from body
+  const { packageId, confirmationDate } = req.body;
 
   if (!packageId) {
     return res.status(400).json({ error: "Missing package ID" });
@@ -190,7 +190,7 @@ const confirmPackage = async (req, res) => {
     pkg.status = "Confirmed";
     pkg.confirmationDate = confirmationDate
       ? new Date(confirmationDate)
-      : new Date(); // use provided or current
+      : new Date();
     await pkg.save();
 
     res.status(200).json({ message: "Package confirmed", packageId });

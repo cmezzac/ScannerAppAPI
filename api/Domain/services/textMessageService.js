@@ -6,15 +6,15 @@ const client = twilio(
   process.env.TWILIO_AUTH_TOKEN
 );
 
-async function sendSMS(to, message) {
+async function sendSMS(phoneNumber, message) {
   try {
     const res = await client.messages.create({
       body: message,
       from: process.env.TWILIO_PHONE_NUMBER,
-      to: to,
+      to: phoneNumber,
     });
 
-    console.log("✅ SMS sent:", res.sid);
+    console.log("✅ SMS sent to", phoneNumber, res.sid);
   } catch (error) {
     console.error("❌ Failed to send SMS:", error.message);
   }

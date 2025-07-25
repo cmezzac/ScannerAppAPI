@@ -8,7 +8,6 @@ const packageSchema = new Schema(
       ref: "User",
       required: true,
     },
-
     processedDate: {
       type: Date,
       required: true,
@@ -25,14 +24,17 @@ const packageSchema = new Schema(
       required: true,
       trim: true,
     },
-
     status: {
       type: String,
       enum: ["Pending", "Confirmed"],
       required: true,
       default: "Pending",
     },
-
+    isAlerted: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
     buildingId: {
       type: Schema.Types.ObjectId,
       ref: "Building",

@@ -17,16 +17,23 @@ const {
   createPackageForUser,
 } = require("../../DataAccess/services/packageService");
 
-const { sendSMS } = require("../../Domain/services/textMessageService");
+const {
+  uploadBase64ImageToS3,
+  deleteFromS3,
+} = require("../../Domain/services/s3ImageService");
 
 const readShippingLabel = async (req, res) => {
+  let s3Image;
   try {
     const { detailsImage, fullPackageImage, isUrgent } = req.body;
-    const moneySwitch = true;
+    const moneySwitch = false;
 
     if (!detailsImage || !fullPackageImage) {
       return res.status(400).json({ error: "Missing image in request body" });
     }
+
+    //base 64 -> S3 url.
+    s3Image = await uploadBase64ImageToS3(fullPackageImage);
 
     let result;
 
@@ -38,46 +45,32 @@ const readShippingLabel = async (req, res) => {
 
       let parsed;
       try {
-        parsed = JSON.parse(cleaned); // ✅ Final usable object
+        parsed = JSON.parse(cleaned);
       } catch (err) {
         console.error("Failed to parse JSON from GPT:", err);
         return res.status(500).json({ error: "Invalid JSON from AI response" });
       }
 
-      result = parsed; // your final structured result
+      result = parsed;
       console.log(result);
     } else {
       console.log("MONEYSWITCH = false");
 
       const shippingLabel = generateFakeShippingLabel();
       result = shippingLabel;
-      //COMMENTED OCR FOR FAKE DATA FOR NOW
-      //const ocrText = await getShippingLabelAsString(image);
-      //result = await readImageLabel(ocrText);
     }
     const data = await createPackageForUser(
       result.Name,
       result.TrackingNumber,
       result.Courier,
-      fullPackageImage,
+      s3Image,
       isUrgent
     );
-
-    const webAppUrl = process.env.WEB_APP_URL;
-
-    const link = `${webAppUrl}/${data._id}`;
-
-    console.log("LINK: ", link);
-    sendSMS(
-      "+15146533143",
-      `📦 You have a new package!\nTrack it here: ${link}`
-    );
-
-    console.log(data);
 
     res.status(200).json(data);
   } catch (error) {
     console.error("❌ Failed to process label:", error);
+    await deleteFromS3(s3Image);
     res.status(500).json({ error: "Failed to process label" });
   }
 };
