@@ -7,17 +7,22 @@ const {
   getPackageDetails,
   confirmPackage,
 } = require("../controllers/PackageController");
+const { authenticateToken } = require("../middleware/authenticationToken");
 
 //GET REQUESTS
-router.get("/pendingPackages", getPendingPackages);
+router.get("/pendingPackages", authenticateToken, getPendingPackages);
 
-router.get("/confirmedPackages", getConfirmedPackages);
+router.get("/confirmedPackages", authenticateToken, getConfirmedPackages);
 
-router.get("/getPackageDetails/:packageId", getPackageDetails);
+router.get(
+  "/getPackageDetails/:packageId",
+  authenticateToken,
+  getPackageDetails
+);
 
 //POST REQUESTS
-router.post("/addPackage", addPackage);
+router.post("/addPackage", authenticateToken, addPackage);
 
-router.post("/confirmPackage", confirmPackage);
+router.post("/confirmPackage", authenticateToken, confirmPackage);
 
 module.exports = router;
