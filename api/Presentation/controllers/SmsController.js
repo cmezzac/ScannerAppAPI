@@ -5,7 +5,15 @@ const { sendSMS } = require("../../Domain/services/textMessageService");
 
 const notifyUsers = async (req, res) => {
   try {
-    const data = req.packageIds;
+    const data = req.body.packageIds;
+
+    console.log(data);
+
+    if (data != null) {
+      return res.status(200).json({
+        message: "Notification process complete.",
+      });
+    }
 
     // Validate request body
     if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
@@ -17,40 +25,34 @@ const notifyUsers = async (req, res) => {
     const failed = [];
     const successful = [];
 
-    for (const [name, trackingIds] of Object.entries(data)) {
-      if (!Array.isArray(trackingIds)) continue;
+    for (const trackingId of data) {
+      try {
+        const pkg = await Package.findOne({ trackingId });
 
-      for (const trackingId of trackingIds) {
-        try {
-          const pkg = await Package.findOne({ trackingId });
-
-          if (!pkg) {
-            console.warn(
-              `❗ Package with tracking ID ${trackingId} not found.`
-            );
-            failed.push({ trackingId, reason: "Package not found" });
-            continue;
-          }
-
-          const {
-            name: firstName,
-            phone,
-            building,
-          } = await getUserAndBuildingInfo(pkg._id);
-
-          const webAppUrl = process.env.WEB_APP_URL;
-          const link = `${webAppUrl}/${pkg._id}`;
-          const message = `${building}\n📦 Hey ${firstName}, we have your package (Tracking ID: ${trackingId}).\nPlease confirm pickup with the doorman:\n${link}`;
-
-          await sendSMS(phone, message);
-          successful.push(trackingId);
-        } catch (innerErr) {
-          console.error(
-            `❌ Failed to send SMS for ${trackingId}:`,
-            innerErr.message
-          );
-          failed.push({ trackingId, reason: innerErr.message });
+        if (!pkg) {
+          console.warn(`❗ Package with tracking ID ${trackingId} not found.`);
+          failed.push({ trackingId, reason: "Package not found" });
+          continue;
         }
+
+        const {
+          name: firstName,
+          phone,
+          building,
+        } = await getUserAndBuildingInfo(pkg._id);
+
+        const webAppUrl = process.env.WEB_APP_URL;
+        const link = `${webAppUrl}/${pkg._id}`;
+        const message = `${building}\n📦 Hey ${firstName}, we have your package (Tracking ID: ${trackingId}).\nPlease confirm pickup with the doorman:\n${link}`;
+
+        await sendSMS(phone, message);
+        successful.push(trackingId);
+      } catch (innerErr) {
+        console.error(
+          `❌ Failed to send SMS for ${trackingId}:`,
+          innerErr.message
+        );
+        failed.push({ trackingId, reason: innerErr.message });
       }
     }
 

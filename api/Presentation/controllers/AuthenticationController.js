@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const {
   generateAccessToken,
   generateRefreshToken,
+  verifyRefreshToken,
 } = require("../../Domain/services/tokenService");
 
 const signup = async (req, res) => {
@@ -34,7 +35,9 @@ const login = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    const user = await AuthUser.findOne({ username });
+    const user = await AuthUser.findOne({ username })
+      .populate("buildingId")
+      .populate("role");
 
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -50,18 +53,45 @@ const login = async (req, res) => {
     const refreshToken = generateRefreshToken(user._id);
 
     res.status(200).json({
-      accessToken,
-      refreshToken,
       user: {
         id: user._id,
         username: user.username,
         buildingId: user.buildingId,
         role: user.role,
       },
+      accessToken,
+      refreshToken,
     });
   } catch (error) {
     res.status(500).json({ message: "Login failed", error: error.message });
   }
 };
 
-module.exports = { signup, login };
+const refresh = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({ message: "Missing refresh token" });
+    }
+
+    const decoded = verifyRefreshToken(refreshToken);
+
+    const user = await AuthUser.findById(decoded.id);
+
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    const newAccessToken = generateAccessToken(user._id);
+
+    res.status(200).json({ accessToken: newAccessToken });
+  } catch (error) {
+    console.error("Refresh token error:", error);
+    return res
+      .status(401)
+      .json({ message: "Invalid or expired refresh token" });
+  }
+};
+
+module.exports = { signup, login, refresh };
