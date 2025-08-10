@@ -7,6 +7,7 @@ const client = twilio(
 );
 
 async function sendSMS(phoneNumber, message) {
+  console.log(phoneNumber);
   try {
     const res = await client.messages.create({
       body: message,

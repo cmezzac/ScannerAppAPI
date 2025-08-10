@@ -6,13 +6,13 @@
 const generateFakeShippingLabel = () => {
   const names = [
     "Christopher Mezzacappa",
-    "Michael Mezzacappa",
-    "George Mandelos",
-    "Ari Zergiotis",
-    "Sofia St-Pierre",
-    "Bianca D'alescio",
-    "Roula Athanasopoulos",
-    "Joseph Mezzacappa",
+    //"Michael Mezzacappa",
+    "Mathew Sakellarakos",
+    //   "Ari Zergiotis",
+    //  "Sofia St-Pierre",
+    // "Bianca D'alescio",
+    // "Roula Athanasopoulos",
+    // "Joseph Mezzacappa",
   ];
 
   const couriers = ["INTL", "USPS", "FEDEX", "UPS", "DHL"];

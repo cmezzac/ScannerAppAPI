@@ -7,13 +7,7 @@ const notifyUsers = async (req, res) => {
   try {
     const data = req.body.packageIds;
 
-    console.log(data);
-
-    if (data != null) {
-      return res.status(200).json({
-        message: "Notification process complete.",
-      });
-    }
+    console.log("Inside Function: ", data);
 
     // Validate request body
     if (!data || typeof data !== "object" || Object.keys(data).length === 0) {
@@ -27,10 +21,10 @@ const notifyUsers = async (req, res) => {
 
     for (const trackingId of data) {
       try {
-        const pkg = await Package.findOne({ trackingId });
+        const pkg = await Package.findOne({ trackingNumber: trackingId });
 
         if (!pkg) {
-          console.warn(`❗ Package with tracking ID ${trackingId} not found.`);
+          console.warn(`❗Package with tracking ID ${trackingId} not found.`);
           failed.push({ trackingId, reason: "Package not found" });
           continue;
         }
@@ -44,7 +38,7 @@ const notifyUsers = async (req, res) => {
         const webAppUrl = process.env.WEB_APP_URL;
         const link = `${webAppUrl}/${pkg._id}`;
         const message = `${building}\n📦 Hey ${firstName}, we have your package (Tracking ID: ${trackingId}).\nPlease confirm pickup with the doorman:\n${link}`;
-
+        console.log("Right before send");
         await sendSMS(phone, message);
         successful.push(trackingId);
       } catch (innerErr) {
