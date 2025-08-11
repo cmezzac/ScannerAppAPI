@@ -48,5 +48,5 @@ app.listen(config.port, "0.0.0.0", () => {
 });
 
 app.get("/health", (_, res) => {
-  res.send("ok");
+  res.send("Hey sexy... 8===D");
 });
