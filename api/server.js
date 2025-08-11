@@ -38,3 +38,7 @@ app.use("/api/auth", authenticationRouter);
 app.listen(config.port, "0.0.0.0", () => {
   console.log(`🚀 Server running at http://0.0.0.0:${config.port}/`);
 });
+
+app.get("/health", (_, res) => {
+  res.send("ok");
+});
