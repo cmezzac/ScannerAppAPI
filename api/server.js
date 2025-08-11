@@ -7,6 +7,14 @@ const app = express();
 
 connectDB(config.mongoUri);
 
+// server.js (top)
+process.on("unhandledRejection", (err) => {
+  console.error("UNHANDLED REJECTION:", err);
+});
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION:", err);
+});
+
 app.use(cors());
 
 //Increase body size limit
@@ -36,7 +44,7 @@ app.use("/api/s3", s3Router);
 app.use("/api/auth", authenticationRouter);
 
 app.listen(config.port, "0.0.0.0", () => {
-  console.log(`🚀 Server running at http://0.0.0.0:${config.port}/`);
+  console.log(`Server is now Running!`);
 });
 
 app.get("/health", (_, res) => {
